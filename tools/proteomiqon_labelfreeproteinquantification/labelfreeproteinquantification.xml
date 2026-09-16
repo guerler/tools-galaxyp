@@ -484,7 +484,7 @@
             </conditional>
             <section name="AggregatePeptideChargeStatesParams">
                 <conditional name="AggregatePeptideChargeStatesParamsCond">
-                    <param name="AggregateModifiedPeptidesParamsEnabled" value="no" />
+                    <param name="AggregatePeptideChargeStatesParamsEnabled" value="no" />
                 </conditional>
             </section>
             <section name="AggregateModifiedPeptidesParams">
@@ -523,7 +523,7 @@
             </conditional>
             <section name="AggregatePeptideChargeStatesParams">
                 <conditional name="AggregatePeptideChargeStatesParamsCond">
-                    <param name="AggregateModifiedPeptidesParamsEnabled" value="no" />
+                    <param name="AggregatePeptideChargeStatesParamsEnabled" value="no" />
                 </conditional>
             </section>
             <section name="AggregateModifiedPeptidesParams">
