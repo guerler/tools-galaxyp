@@ -10,6 +10,11 @@ on:
         type: choice
         options: [subset, full]
         default: full
+      submission:
+        description: 'async = POST /api/jobs (typed path); legacy = POST /api/tools (control baseline)'
+        type: choice
+        options: [async, legacy]
+        default: async
       repositories:
         description: 'Space or newline separated repository paths, to verify a fix without waiting for the whole subset. Overrides scope when set.'
         type: string
@@ -24,7 +29,9 @@ env:
   PYTHON_VERSION: '3.11'
   # galaxy-tool-util's interactor defaults to use_legacy_api="always", and released planemo
   # does not override it, so stock planemo submits to /api/tools. This branch defaults
-  # --use_async_submission=True, which is the path these tests exist to cover.
+  # --use_async_submission=True, which is the path these tests exist to cover. The same
+  # branch serves the legacy control arm via --no_use_async_submission, so both arms
+  # differ only in the submission path.
   # Not named PLANEMO_*: planemo sets auto_envvar_prefix="PLANEMO", so such a variable
   # is read as an option value and PLANEMO_VERSION lands on its --version flag.
   ASYNC_PLANEMO: "git+https://github.com/guerler/planemo.git@async-submission"
@@ -173,6 +180,8 @@ jobs:
         chunk-count: ${{ needs.setup.outputs.chunk-count }}
         galaxy-slots: ${{ steps.cpu-cores.outputs.count }}
         test_timeout: 900
+        # The planemo branch defaults to async, so only the legacy arm passes a flag.
+        additional-planemo-options: ${{ inputs.submission == 'legacy' && '--no_use_async_submission' || '' }}
     - uses: actions/upload-artifact@v7
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
