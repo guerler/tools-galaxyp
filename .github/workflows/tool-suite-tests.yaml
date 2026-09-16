@@ -19,6 +19,10 @@ on:
         description: 'Space or newline separated repository paths, to verify a fix without waiting for the whole subset. Overrides scope when set.'
         type: string
         default: ''
+      update_test_data:
+        description: 'Regenerate expected outputs and upload the changed files instead of asserting against them'
+        type: boolean
+        default: false
 env:
   GALAXY_FORK: galaxyproject
   GALAXY_BRANCH: dev
@@ -180,11 +184,32 @@ jobs:
         chunk-count: ${{ needs.setup.outputs.chunk-count }}
         galaxy-slots: ${{ steps.cpu-cores.outputs.count }}
         test_timeout: 900
-        additional-planemo-options: ${{ inputs.submission == 'legacy' && '--no_use_async_submission' || '--use_async_submission' }}
+        additional-planemo-options: >-
+          ${{ inputs.submission == 'legacy' && '--no_use_async_submission' || '--use_async_submission' }}
+          ${{ inputs.update_test_data && '--update_test_data' || '' }}
     - uses: actions/upload-artifact@v7
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
         path: upload
+    - name: Collect regenerated test data
+      if: ${{ inputs.update_test_data }}
+      run: |
+        set -euo pipefail
+        mkdir -p regenerated
+        git status --porcelain -- tools/ | awk '{print $NF}' > changed.txt
+        while read -r f; do
+          [ -f "$f" ] || continue
+          mkdir -p "regenerated/$(dirname "$f")"
+          cp "$f" "regenerated/$f"
+        done < changed.txt
+        echo "regenerated $(grep -c . changed.txt || echo 0) file(s)"
+    - name: Upload regenerated test data
+      if: ${{ inputs.update_test_data }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: 'Regenerated test data ${{ matrix.chunk }}'
+        path: regenerated
+        if-no-files-found: warn
     # A failed submission is raised in the Galaxy Celery worker, so the traceback lives
     # in the worker log rather than in the planemo output.
     - name: Collect Galaxy server logs
