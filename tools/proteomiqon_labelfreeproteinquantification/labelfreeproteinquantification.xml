@@ -1,4 +1,4 @@
-<tool id="proteomiqon_labelfreeproteinquantification" name="Proteomiqon LabelFreeProteinQuantification" version="@VERSION@" profile="20.05">
+<tool id="proteomiqon_labelfreeproteinquantification" name="Proteomiqon LabelFreeProteinQuantification" version="@VERSION@+galaxy1" profile="20.05">
     <description>
         estimates protein abundances using quantified peptide ions.
     </description>
