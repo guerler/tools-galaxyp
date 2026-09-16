@@ -180,8 +180,7 @@ jobs:
         chunk-count: ${{ needs.setup.outputs.chunk-count }}
         galaxy-slots: ${{ steps.cpu-cores.outputs.count }}
         test_timeout: 900
-        # The planemo branch defaults to async, so only the legacy arm passes a flag.
-        additional-planemo-options: ${{ inputs.submission == 'legacy' && '--no_use_async_submission' || '' }}
+        additional-planemo-options: ${{ inputs.submission == 'legacy' && '--no_use_async_submission' || '--use_async_submission' }}
     - uses: actions/upload-artifact@v7
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
